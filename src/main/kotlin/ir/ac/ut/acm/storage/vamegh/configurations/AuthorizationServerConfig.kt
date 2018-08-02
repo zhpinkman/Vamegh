@@ -1,11 +1,11 @@
 package ir.ac.ut.acm.storage.vamegh.configurations
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.configurers.ClientDetailsServiceConfigurer
 import org.springframework.security.oauth2.config.annotation.web.configuration.AuthorizationServerConfigurerAdapter
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableAuthorizationServer
@@ -18,7 +18,8 @@ import org.springframework.security.oauth2.provider.token.store.JwtTokenStore
 
 @Configuration
 @EnableAuthorizationServer
-class AuthorizationServerConfig(private @field:Autowired val authenticationManager: AuthenticationManager? = null) : AuthorizationServerConfigurerAdapter() {
+class AuthorizationServerConfig(val authenticationManager: AuthenticationManager, val passwordEncoder: PasswordEncoder) : AuthorizationServerConfigurerAdapter() {
+
 
     @Throws(Exception::class)
     override fun configure(security: AuthorizationServerSecurityConfigurer?) {
@@ -26,17 +27,17 @@ class AuthorizationServerConfig(private @field:Autowired val authenticationManag
                 .tokenKeyAccess("permitAll()")
                 .checkTokenAccess("isAuthenticated()")
                 .allowFormAuthenticationForClients()
+                .passwordEncoder(passwordEncoder)
     }
     @Throws(Exception::class)
     override fun configure(clients: ClientDetailsServiceConfigurer?) {
         clients!!
                 .inMemory().withClient("client")
-                .authorizedGrantTypes("password" , "refresh-token")
+                .authorizedGrantTypes("password" , "refresh_token")
                 .scopes("read" , "write")
-                .resourceIds("oauth2-resource")
                 .accessTokenValiditySeconds(5000)
                 .refreshTokenValiditySeconds(500000)
-                .secret("secret")
+                .secret(passwordEncoder.encode("secret"))
 
     }
     @Throws(Exception::class)
@@ -69,5 +70,14 @@ class AuthorizationServerConfig(private @field:Autowired val authenticationManag
         defaultTokenServices.setTokenStore(tokenStore())
         defaultTokenServices.setSupportRefreshToken(true)
         return defaultTokenServices
+    }
+}
+@Configuration
+class WebSecurityConfig : WebSecurityConfigurerAdapter(){
+
+    @Bean
+    @Throws(Exception::class)
+    fun customAuthenticationManager(): AuthenticationManager {
+        return authenticationManager()
     }
 }
