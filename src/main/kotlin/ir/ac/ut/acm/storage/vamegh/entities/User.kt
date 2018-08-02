@@ -14,6 +14,9 @@ class User (
         val id: String? = null ,
         @Indexed(unique = true)
         val email: String,
-        val password: String ) {
+        val password: String,
+        @Indexed(unique = true)
+        val bucketName: String) {
+
 
 }
