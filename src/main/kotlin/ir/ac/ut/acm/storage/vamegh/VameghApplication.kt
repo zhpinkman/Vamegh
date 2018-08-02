@@ -13,8 +13,6 @@ class VameghApplication {
 
     @Autowired
     lateinit var userService: UserDetailsService
-    @Autowired
-    lateinit var fileStorage: FileStorageService;
 
     @Autowired
     @Throws(Exception::class)
