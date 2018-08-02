@@ -17,9 +17,9 @@ class FileStorageServiceImpl : FileStorageService {
 
     override fun store(file: MultipartFile  , user: User, path: String){
         try{
-            val newFile = File()
+            val newFile = File("$rootLocation/${user.bucketName}$path/${file.originalFilename}")
             newFile.createNewFile()
-//            file.transferTo(newFile)
+            file.transferTo(newFile)
         }
         catch(e: Exception){
             logger.error("Error in saving file: ${e.message}")
