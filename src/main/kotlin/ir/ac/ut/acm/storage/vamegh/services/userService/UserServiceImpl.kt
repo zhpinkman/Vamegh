@@ -1,4 +1,4 @@
-package ir.ac.ut.acm.storage.vamegh.services.UserService
+package ir.ac.ut.acm.storage.vamegh.services.userService
 
 import ir.ac.ut.acm.storage.vamegh.Exeptions.NotUniqueException
 import ir.ac.ut.acm.storage.vamegh.configurations.PasswordEncoder
@@ -6,7 +6,6 @@ import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.stereotype.Service
 
 @Service

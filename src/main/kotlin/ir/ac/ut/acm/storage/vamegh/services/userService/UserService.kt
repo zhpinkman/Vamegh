@@ -1,4 +1,4 @@
-package ir.ac.ut.acm.storage.vamegh.services.UserService
+package ir.ac.ut.acm.storage.vamegh.services.userService
 
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
 import ir.ac.ut.acm.storage.vamegh.entities.User

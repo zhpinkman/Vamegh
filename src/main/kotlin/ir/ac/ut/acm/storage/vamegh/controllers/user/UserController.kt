@@ -2,7 +2,7 @@ package ir.ac.ut.acm.storage.vamegh.controllers.user
 
 
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
-import ir.ac.ut.acm.storage.vamegh.services.UserService.UserService
+import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
