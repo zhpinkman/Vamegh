@@ -1,4 +1,4 @@
-package ir.ac.ut.acm.storage.vamegh.controllers.user
+package ir.ac.ut.acm.storage.vamegh.controllers.file
 
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.services.FileStorageService
