@@ -1,9 +1,7 @@
 package ir.ac.ut.acm.storage.vamegh.controllers.user
 
-import ir.ac.ut.acm.storage.vamegh.configurations.PasswordEncoder
+
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
-import ir.ac.ut.acm.storage.vamegh.entities.User
-import ir.ac.ut.acm.storage.vamegh.repositories.UserRepository
 import ir.ac.ut.acm.storage.vamegh.services.UserService.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
