@@ -1,7 +1,7 @@
 package ir.ac.ut.acm.storage.vamegh.services
 
 import ir.ac.ut.acm.storage.vamegh.entities.MyUserDetails
-import ir.ac.ut.acm.storage.vamegh.entities.User
+import ir.ac.ut.acm.storage.vamegh.services.UserService.UserServiceImpl
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service
 class VameghUserDetailsService : UserDetailsService {
 
     @Autowired
-    private lateinit var userService: UserService
+    private lateinit var userService: UserServiceImpl
 
     override fun loadUserByUsername(username: String?): UserDetails? {
         if (username == null)

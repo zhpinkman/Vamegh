@@ -1,8 +1,8 @@
 package ir.ac.ut.acm.storage.vamegh.controllers.file
 
-import ir.ac.ut.acm.storage.vamegh.entities.User
+
 import ir.ac.ut.acm.storage.vamegh.services.FileStorageService
-import ir.ac.ut.acm.storage.vamegh.services.UserService
+import ir.ac.ut.acm.storage.vamegh.services.UserService.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PostMapping
