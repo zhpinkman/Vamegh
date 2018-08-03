@@ -1,5 +1,6 @@
 package ir.ac.ut.acm.storage.vamegh.services.userService
 
+import ir.ac.ut.acm.storage.vamegh.Exeptions.EntityNotFound
 import ir.ac.ut.acm.storage.vamegh.Exeptions.NotUniqueException
 import ir.ac.ut.acm.storage.vamegh.configurations.PasswordEncoder
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
@@ -17,7 +18,7 @@ class UserServiceImpl: UserService {
     lateinit var passwordEncoder: PasswordEncoder
 
     override fun findByEmail(email: String) : User {
-       return userRepository.findByEmail(email)
+       return userRepository.findByEmail(email) ?: throw EntityNotFound("user with email: $email not found")
     }
 
     override fun register(registerRequest: RegisterRequest){
