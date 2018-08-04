@@ -7,7 +7,9 @@ import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.repositories.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
+import java.io.File
 
 @Service
 class UserServiceImpl: UserService {
@@ -17,6 +19,9 @@ class UserServiceImpl: UserService {
     @Autowired
     lateinit var passwordEncoder: PasswordEncoder
 
+    @Value("\${utCloud.storagePath}")
+    lateinit var rootLocation: String
+
     override fun findByEmail(email: String) : User {
        return userRepository.findByEmail(email) ?: throw EntityNotFound("user with email: $email not found")
     }
@@ -25,6 +30,7 @@ class UserServiceImpl: UserService {
         try {
             val passwordEncoded = passwordEncoder.encode(registerRequest.password)
             val user = User(email = registerRequest.email, bucketName = registerRequest.bucketName, password = passwordEncoded)
+            File("$rootLocation/${registerRequest.bucketName}").mkdir()
             userRepository.save(user)
         }catch (e: Exception){
             throw NotUniqueException()
