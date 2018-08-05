@@ -26,7 +26,7 @@ class FileController {
 
     @PostMapping ("/upload")
     @PreAuthorize("isAuthenticated()")
-    fun uploadMultiFile(@RequestParam("file") file: MultipartFile,@RequestParam("path") path: String , principal: Principal){
+    fun uploadMultiFile(@RequestParam("file") file: MultipartFile,@RequestParam("path") path: String = "" , principal: Principal){
         val user = userService.findByEmail(principal.name)
         fileStorage.store(file, user, path);
     }
