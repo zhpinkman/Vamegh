@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
+import java.time.LocalDateTime
+import java.util.*
+
 
 @Service
 class FileStorageServiceImpl : FileStorageService {
@@ -32,7 +35,9 @@ class FileStorageServiceImpl : FileStorageService {
     }
 
     override fun creatFileEntityOnDb(path: String, isDir: Boolean){
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        val now = LocalDateTime.now()
+        //date is okey but where should i get other informations:/
+        this.fileRepository.insert(FileEntity(name = "",size=0,parentId = "",creationDate = now,isDir=isDir,path=path ));
     }
 
     override fun store(file: MultipartFile  , user: User, path: String){
