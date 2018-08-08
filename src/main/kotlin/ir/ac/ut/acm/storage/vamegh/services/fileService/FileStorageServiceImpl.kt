@@ -35,8 +35,8 @@ class FileStorageServiceImpl : FileStorageService {
     }
 
     override fun creatFileEntityOnDb(path: String, isDir: Boolean){
-        val now = LocalDateTime.now()
-        //date is okey but where should i get other informations:/
+        val now = Date()
+        //date is okay but where should i get other informations
         this.fileRepository.insert(FileEntity(name = "",size=0,parentId = "",creationDate = now,isDir=isDir,path=path ));
     }
 

@@ -12,6 +12,6 @@ class FileEntity (
         val size: Long,
         var parentId: String,
         var path: String,
-        val creationDate: LocalDateTime,
+        val creationDate: Date,
         val isDir: Boolean
 )
