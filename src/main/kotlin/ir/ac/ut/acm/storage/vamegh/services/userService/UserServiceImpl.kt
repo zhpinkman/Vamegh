@@ -1,8 +1,8 @@
 package ir.ac.ut.acm.storage.vamegh.services.userService
 
-import ir.ac.ut.acm.storage.vamegh.Exeptions.EntityNotFound
-import ir.ac.ut.acm.storage.vamegh.Exeptions.NotUniqueException
-import ir.ac.ut.acm.storage.vamegh.Exeptions.invalidEmailException
+import ir.ac.ut.acm.storage.vamegh.exceptions.EntityNotFound
+import ir.ac.ut.acm.storage.vamegh.exceptions.InvalidEmailException
+import ir.ac.ut.acm.storage.vamegh.exceptions.NotUniqueException
 import ir.ac.ut.acm.storage.vamegh.configurations.PasswordEncoder
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
 import ir.ac.ut.acm.storage.vamegh.entities.User
@@ -12,15 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 
-
-class EmailValidator {
-    companion object {
-        @JvmStatic val EMAIL_REGEX = "[^ @+-]*@(ut.ac.ir)$";
-        fun isEmailValid(email: String): Boolean {
-            return EMAIL_REGEX.toRegex().matches(email);
-        }
-    }
-}
 
 
 @Service
@@ -41,14 +32,19 @@ class UserServiceImpl: UserService {
 
     override fun register(registerRequest: RegisterRequest){
         try {
-            if(!EmailValidator.isEmailValid(registerRequest.email))
-                throw invalidEmailException("email you entered is not valid!!")
+            val emailPattern = "[^ @+-]*@(ut.ac.ir)$"
+            if (!emailPattern.toRegex().matches(registerRequest.email))
+                throw InvalidEmailException("email you entered is not valid!!")
             val passwordEncoded = passwordEncoder.encode(registerRequest.password)
             val user = User(email = registerRequest.email.toLowerCase(), bucketName = registerRequest.bucketName, password = passwordEncoded)
             userRepository.save(user)
             fileStorageService.mkDir(rootLocation + "/" + registerRequest.bucketName)
-        }catch (e: Exception){
+
+        }catch (e: InvalidEmailException){
             throw e
+        }
+        catch (e: Exception) {
+            throw NotUniqueException()
         }
 
     }

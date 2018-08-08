@@ -62,7 +62,7 @@ class FileStorageServiceImpl : FileStorageService {
     override fun mkDir(path: String) {
         try{
             File(path).mkdir();
-//            this.creatFileEntityOnDb( path , true )
+            this.creatFileEntityOnDb( path , true )
         }
         catch(e: Exception){
             logger.error("Error in Creating Directory: ${e.message}")

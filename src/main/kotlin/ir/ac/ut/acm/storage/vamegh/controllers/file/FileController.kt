@@ -35,11 +35,12 @@ class FileController {
         fileStorage.store(file, user, path);
     }
 
-    @PostMapping ("/list")
+    @GetMapping ("/list")
     @PreAuthorize("isAuthenticated()")
     fun getFilesList(@RequestParam("path") path: String , principal: Principal): List<FileEntity>{
         val user = userService.findByEmail(principal.name)
         val completePath = rootLocation + "/" + user.bucketName + "/" + path
+        println(completePath)
         return fileStorage.getFilesList(completePath)
     }
 
