@@ -4,6 +4,7 @@ import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.exceptions.NotUniqueException
+import ir.ac.ut.acm.storage.vamegh.exceptions.UnableToCreateDirectory
 import ir.ac.ut.acm.storage.vamegh.exceptions.UnexcpectedNullException
 import ir.ac.ut.acm.storage.vamegh.repositories.FileRepository
 import org.slf4j.LoggerFactory
@@ -112,7 +113,9 @@ class FileStorageServiceImpl : FileStorageService {
             }
             else
                 completeParentPath = "$rootLocation$parentPath"
-            File("$completeParentPath/$name").mkdir()
+            val created = File("$completeParentPath/$name").mkdir()
+            if(!created)
+                throw UnableToCreateDirectory("Directory could not be created!")
             this.createFileEntityOnDb( name = name , isDir = true , size = 0 , parentPath = completeParentPath , isParentUnderBucket = isParentUnderBucket , type = "Directory" )
 
         }

@@ -38,8 +38,9 @@ class UserServiceImpl: UserService {
                 throw InvalidEmailException("email you entered is not valid!!")
             val passwordEncoded = passwordEncoder.encode(registerRequest.password)
             val user = User(email = registerRequest.email.toLowerCase(), bucketName = registerRequest.bucketName, password = passwordEncoded)
-            userRepository.save(user)
             fileStorageService.mkDir(  name = registerRequest.bucketName ,parentPath = "/")
+            userRepository.save(user)
+
         }
         catch (e: DuplicateKeyException) {
             throw NotUniqueException("Chosen Email or Bucket name is not unique")
