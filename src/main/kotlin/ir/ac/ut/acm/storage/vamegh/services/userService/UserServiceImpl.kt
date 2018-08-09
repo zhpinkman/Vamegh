@@ -39,10 +39,10 @@ class UserServiceImpl: UserService {
             val passwordEncoded = passwordEncoder.encode(registerRequest.password)
             val user = User(email = registerRequest.email.toLowerCase(), bucketName = registerRequest.bucketName, password = passwordEncoded)
             userRepository.save(user)
-            fileStorageService.mkDir(rootLocation + "/" + registerRequest.bucketName)
+            fileStorageService.mkDir(  name = registerRequest.bucketName ,parentPath = "/")
         }
         catch (e: DuplicateKeyException) {
-            throw NotUniqueException()
+            throw NotUniqueException("Chosen Email or Bucket name is not unique")
         }
 
     }

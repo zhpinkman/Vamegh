@@ -13,4 +13,4 @@ spring:
       max-file-size: 1024MB
       max-request-size: 1024MB
 utCloud:
-  storagePath: /home/zhivar/Desktop/cloudFiles
+  storagePath: /home/"Your user"/Desktop/cloud

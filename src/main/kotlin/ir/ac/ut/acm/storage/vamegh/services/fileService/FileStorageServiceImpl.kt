@@ -1,16 +1,20 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
+
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
+import ir.ac.ut.acm.storage.vamegh.exceptions.NotUniqueException
+import ir.ac.ut.acm.storage.vamegh.exceptions.UnexcpectedNullException
 import ir.ac.ut.acm.storage.vamegh.repositories.FileRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.util.*
 
 
 @Service
@@ -25,7 +29,7 @@ class FileStorageServiceImpl : FileStorageService {
     @Autowired
     lateinit var fileRepository: FileRepository
 
-    override fun renameFile(renameRequest: RenameRequest , user: User) {
+    override fun renameFile(renameRequest: RenameRequest, user: User) {
         try {
             val parentPath: String
             if(renameRequest.parentPath != "/")
@@ -45,9 +49,10 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
+
     override fun createFileEntityOnDb(name: String, size: Long, parentPath: String, isParentUnderBucket: Boolean, isDir: Boolean, type: String) {
         try {
-            val now = LocalDateTime.now(ZoneId.of())
+            val now = Date()
             val parentId: String?
             if(isParentUnderBucket)
                 parentId = fileRepository.findByPath(parentPath).id
@@ -56,13 +61,12 @@ class FileStorageServiceImpl : FileStorageService {
             val completePath = "$parentPath/$name"
             this.fileRepository.save(FileEntity(name = name , size=size ,parentId = parentId ,creationDate = now , isDir=isDir , path = completePath , type = type ))
         }
-        catch(e: Exception){
-            logger.error("Error in Creating File Entity On Data Base: ${e.message}")
-            throw e
+        catch (e: DuplicateKeyException) {
+            throw NotUniqueException("Chosen Email or Bucket name is not unique")
         }
     }
 
-    override fun store(file: MultipartFile, user: User, path: String) {
+    override fun store(file: MultipartFile  , user: User, path: String){
         try{
             val parentPath : String
             if(path == "/"){
@@ -75,7 +79,6 @@ class FileStorageServiceImpl : FileStorageService {
             newFile.createNewFile()
             file.transferTo(newFile)
             this.createFileEntityOnDb( name = file.originalFilename!! ,isDir = false ,  size = file.size , parentPath = parentPath , isParentUnderBucket = true , type = file.contentType!! )
-
         }
         catch(e: Exception){
             logger.error("Error in saving file: ${e.message}")
@@ -86,11 +89,11 @@ class FileStorageServiceImpl : FileStorageService {
     override fun getFilesList(path: String, user: User): List<FileEntity> {
         try {
             val completeParentPath = "$rootLocation/${user.bucketName}"
-            val parentId: String?
+            val parentId: String
             if(path != "/")
-                parentId = this.fileRepository.findByPath(completeParentPath + path).id
+                parentId = this.fileRepository.findByPath(completeParentPath + path).id?: throw UnexcpectedNullException("id of file entity found null")
             else
-                parentId =  this.fileRepository.findByPath(completeParentPath).id
+                parentId =  this.fileRepository.findByPath(completeParentPath).id?: throw UnexcpectedNullException("id of file entity found null")
             println(this.fileRepository.findAllByParentId(parentId))
             return this.fileRepository.findAllByParentId(parentId)
         } catch(e: Exception){
@@ -111,6 +114,7 @@ class FileStorageServiceImpl : FileStorageService {
                 completeParentPath = "$rootLocation$parentPath"
             File("$completeParentPath/$name").mkdir()
             this.createFileEntityOnDb( name = name , isDir = true , size = 0 , parentPath = completeParentPath , isParentUnderBucket = isParentUnderBucket , type = "Directory" )
+
         }
         catch(e: Exception){
             logger.error("Error in Creating Directory: ${e.message}")
