@@ -1,10 +1,12 @@
 package ir.ac.ut.acm.storage.vamegh.controllers.file
 
 
+import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileList
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -41,5 +43,17 @@ class FileController {
     fun rename(@RequestBody renameRequest: RenameRequest, principal: Principal) {
             val user = userService.findByEmail(principal.name)
             fileStorage.renameFile(renameRequest = renameRequest , user = user)
+    }
+
+    val logger = LoggerFactory.getLogger(this.javaClass)
+    @PostMapping("/delete")
+    @PreAuthorize("isAuthenticated()")
+    fun deleteById(@RequestBody deleteRequest: DeleteRequest, principal: Principal){
+        try{
+            val user = userService.findByEmail(principal.name)
+            fileStorage.deleteFile(deleteRequest , user)
+        }catch (e: Exception){
+
         }
+    }
 }

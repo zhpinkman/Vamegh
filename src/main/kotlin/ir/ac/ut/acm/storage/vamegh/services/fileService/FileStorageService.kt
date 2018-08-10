@@ -1,5 +1,6 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
 
+import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
@@ -11,4 +12,5 @@ interface FileStorageService{
     fun createFileEntityOnDb( name: String , size: Long , parentPath: String, isParentUnderBucket: Boolean , isDir: Boolean , type: String)
     fun getFilesList(path: String , user: User): List<FileEntity>
     fun renameFile(renameRequest: RenameRequest, user: User)
+    fun deleteFile(deleteRequest: DeleteRequest, user: User)
 }

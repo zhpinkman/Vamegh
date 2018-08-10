@@ -1,8 +1,10 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
 
+import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
+import ir.ac.ut.acm.storage.vamegh.exceptions.EntityNotFound
 import ir.ac.ut.acm.storage.vamegh.exceptions.NotUniqueException
 import ir.ac.ut.acm.storage.vamegh.exceptions.UnableToCreateDirectory
 import ir.ac.ut.acm.storage.vamegh.exceptions.UnexcpectedNullException
@@ -16,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.time.LocalDateTime
 import java.util.*
+import javax.swing.plaf.UIResource
 
 
 @Service
@@ -40,6 +43,8 @@ class FileStorageServiceImpl : FileStorageService {
             val file = File("$parentPath/${renameRequest.oldName}")
             file.renameTo(File("$parentPath/${renameRequest.newName}"))
             val fileEntity = fileRepository.findByPath("$parentPath/${renameRequest.oldName}")
+                    ?: throw EntityNotFound("file not found")
+
             fileEntity.name = renameRequest.newName
             fileRepository.save(fileEntity)
         }
@@ -49,14 +54,25 @@ class FileStorageServiceImpl : FileStorageService {
         }
 
     }
+    override fun deleteFile(deleteRequest: DeleteRequest , user: User) {
+        val entityPath = "${user.bucketName}${deleteRequest.path}"
+        val fileEntity = fileRepository.findByPath(entityPath)
+                ?: throw EntityNotFound("file with path $entityPath not found")
+        fileRepository.delete(fileEntity)
+//        fileRepository.deleteById(fileEntity.id ?: throw UnexcpectedNullException("entity id is null"))
 
+        val diskPath = "$rootLocation/${user.bucketName}${deleteRequest.path}"
+        val file = File(diskPath)
+        file.delete()
+
+    }
 
     override fun createFileEntityOnDb(name: String, size: Long, parentPath: String, isParentUnderBucket: Boolean, isDir: Boolean, type: String) {
         try {
             val now = Date()
             val parentId: String?
             if(isParentUnderBucket)
-                parentId = fileRepository.findByPath(parentPath).id
+                parentId = fileRepository.findByPath(parentPath)?.id ?: throw UnexcpectedNullException("id is null")
             else
                 parentId = parentPath
             val completePath = "$parentPath/$name"
@@ -91,11 +107,9 @@ class FileStorageServiceImpl : FileStorageService {
         try {
             val completeParentPath = "$rootLocation/${user.bucketName}"
             val parentId: String
-            if(path != "/")
-                parentId = this.fileRepository.findByPath(completeParentPath + path).id?: throw UnexcpectedNullException("id of file entity found null")
+            parentId = if(path != "/") this.fileRepository.findByPath(completeParentPath + path)?.id ?: throw UnexcpectedNullException("id of file entity found null")
             else
-                parentId =  this.fileRepository.findByPath(completeParentPath).id?: throw UnexcpectedNullException("id of file entity found null")
-            println(this.fileRepository.findAllByParentId(parentId))
+                this.fileRepository.findByPath(completeParentPath)?.id ?: throw UnexcpectedNullException("id of file entity found null")
             return this.fileRepository.findAllByParentId(parentId)
         } catch(e: Exception){
             logger.error("Error in  getting Files list: ${e.message}")
@@ -125,5 +139,6 @@ class FileStorageServiceImpl : FileStorageService {
         }
 
     }
+
 
 }
