@@ -16,9 +16,7 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.time.LocalDateTime
 import java.util.*
-import javax.swing.plaf.UIResource
 
 
 @Service
@@ -87,11 +85,11 @@ class FileStorageServiceImpl : FileStorageService {
         try{
             val parentPath : String
             if(path == "/"){
-                parentPath = "$rootLocation/${user.bucketName}"
+                parentPath = "/${user.bucketName}"
             }
             else
-                parentPath = "$rootLocation/${user.bucketName}$path"
-            val completePath = "$parentPath/${file.originalFilename}"
+                parentPath = "/${user.bucketName}$path"
+            val completePath = "$rootLocation$parentPath/${file.originalFilename}"
             val newFile = File(completePath)
             newFile.createNewFile()
             file.transferTo(newFile)
@@ -123,14 +121,14 @@ class FileStorageServiceImpl : FileStorageService {
             var isParentUnderBucket = true
             if(parentPath == "/"){
                 isParentUnderBucket = false
-                completeParentPath = rootLocation
+                completeParentPath = ""
             }
             else
-                completeParentPath = "$rootLocation$parentPath"
-            val created = File("$completeParentPath/$name").mkdir()
+                completeParentPath = parentPath
+            val created = File("$rootLocation$completeParentPath/$name").mkdir()
             if(!created)
                 throw UnableToCreateDirectory("Directory could not be created!")
-            this.createFileEntityOnDb( name = name , isDir = true , size = 0 , parentPath = completeParentPath , isParentUnderBucket = isParentUnderBucket , type = "Directory" )
+            this.createFileEntityOnDb( name = name , isDir = true , size = 0 , parentPath = completeParentPath , isParentUnderBucket = isParentUnderBucket , type = "dir" )
 
         }
         catch(e: Exception){
