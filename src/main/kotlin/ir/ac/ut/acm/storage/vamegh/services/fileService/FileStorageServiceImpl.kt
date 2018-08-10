@@ -57,12 +57,9 @@ class FileStorageServiceImpl : FileStorageService {
         val fileEntity = fileRepository.findByPath(entityPath)
                 ?: throw EntityNotFound("file with path $entityPath not found")
         fileRepository.delete(fileEntity)
-//        fileRepository.deleteById(fileEntity.id ?: throw UnexcpectedNullException("entity id is null"))
-
         val diskPath = "$rootLocation/${user.bucketName}${deleteRequest.path}"
         val file = File(diskPath)
         file.delete()
-
     }
 
     override fun createFileEntityOnDb(name: String, size: Long, parentPath: String, isParentUnderBucket: Boolean, isDir: Boolean, type: String) {
