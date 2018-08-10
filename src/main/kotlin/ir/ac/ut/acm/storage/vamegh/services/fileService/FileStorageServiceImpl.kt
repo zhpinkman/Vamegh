@@ -35,11 +35,11 @@ class FileStorageServiceImpl : FileStorageService {
         try {
             val parentPath: String
             if(renameRequest.parentPath != "/")
-                parentPath = rootLocation + "/" +  user.bucketName + renameRequest.parentPath
+                parentPath =  "/" +  user.bucketName + renameRequest.parentPath
             else
-                parentPath = rootLocation +  "/" + user.bucketName
-            val file = File("$parentPath/${renameRequest.oldName}")
-            file.renameTo(File("$parentPath/${renameRequest.newName}"))
+                parentPath =   "/" + user.bucketName
+            val file = File("$rootLocation$parentPath/${renameRequest.oldName}")
+            file.renameTo(File("$rootLocation$parentPath/${renameRequest.newName}"))
             val fileEntity = fileRepository.findByPath("$parentPath/${renameRequest.oldName}")
                     ?: throw EntityNotFound("file not found")
 
@@ -103,11 +103,12 @@ class FileStorageServiceImpl : FileStorageService {
 
     override fun getFilesList(path: String, user: User): List<FileEntity> {
         try {
-            val completeParentPath = "$rootLocation/${user.bucketName}"
+            val completeParentPath = "/${user.bucketName}"
             val parentId: String
-            parentId = if(path != "/") this.fileRepository.findByPath(completeParentPath + path)?.id ?: throw UnexcpectedNullException("id of file entity found null")
+            if(path != "/")
+                parentId =  this.fileRepository.findByPath(completeParentPath + path)?.id ?: throw UnexcpectedNullException("id of file entity found null")
             else
-                this.fileRepository.findByPath(completeParentPath)?.id ?: throw UnexcpectedNullException("id of file entity found null")
+                parentId =  this.fileRepository.findByPath(completeParentPath)?.id ?: throw UnexcpectedNullException("id of file entity found null")
             return this.fileRepository.findAllByParentId(parentId)
         } catch(e: Exception){
             logger.error("Error in  getting Files list: ${e.message}")
