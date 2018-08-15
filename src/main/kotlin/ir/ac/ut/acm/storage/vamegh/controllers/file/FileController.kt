@@ -48,7 +48,7 @@ class FileController {
     val logger = LoggerFactory.getLogger(this.javaClass)
     @PostMapping("/delete")
     @PreAuthorize("isAuthenticated()")
-    fun deleteById(@RequestBody deleteRequest: DeleteRequest, principal: Principal){
+    fun delete(@RequestBody deleteRequest: DeleteRequest, principal: Principal){
         try{
             val user = userService.findByEmail(principal.name)
             fileStorage.deleteFile(deleteRequest , user)

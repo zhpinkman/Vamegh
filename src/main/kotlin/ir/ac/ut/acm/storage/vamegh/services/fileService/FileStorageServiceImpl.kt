@@ -1,5 +1,4 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
-
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
@@ -76,7 +75,8 @@ class FileStorageServiceImpl : FileStorageService {
         catch (e: DuplicateKeyException) {
             throw NotUniqueException("Chosen Email or Bucket name is not unique")
         }
-    }
+
+        }
 
     override fun store(file: MultipartFile  , user: User, path: String){
         try{

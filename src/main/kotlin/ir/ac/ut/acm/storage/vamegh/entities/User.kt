@@ -16,8 +16,7 @@ class User (
         val email: String,
         val password: String,
         @Indexed(unique = true)
-        val bucketName: String) {
-
-
-}
+        val bucketName: String,
+        var active: Boolean = false,
+        var token: VerificationToken = VerificationToken() )
 

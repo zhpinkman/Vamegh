@@ -9,6 +9,7 @@ class MyUserDetails : UserDetails {
     var _username: String = ""
     var _password: String = ""
     var _userId: String = ""
+    var _active: Boolean = false
 
     override fun getUsername(): String {
         return _username
@@ -19,7 +20,7 @@ class MyUserDetails : UserDetails {
     }
 
     override fun isEnabled(): Boolean {
-        return true
+        return _active
     }
 
     override fun isAccountNonExpired(): Boolean {
