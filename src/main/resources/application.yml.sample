@@ -1,6 +1,18 @@
 server:
   port: 9500
 spring:
+  mail:
+    username: utsoccloud@gmail.com
+    host: smtp.gmail.com
+    password: utcloud1397
+    default-encoding: utf-8
+    port: 465
+    protocol: smtp
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true
   data:
     mongodb:
       host: localhost
