@@ -61,7 +61,7 @@ class FileController {
             val user = userService.findByEmail(principal.name)
             fileStorage.deleteFile(deleteRequest , user)
         }catch (e: Exception){
-
+            throw e
         }
     }
 

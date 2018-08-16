@@ -12,14 +12,10 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
-import java.util.*
-import java.nio.file.StandardCopyOption
-import java.nio.file.CopyOption
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.nio.file.Path
-
-
+import java.nio.file.StandardCopyOption
+import java.util.*
 
 
 @Service
@@ -58,12 +54,15 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
     override fun deleteFile(deleteRequest: DeleteRequest , user: User) {
-        val entityPath = "${user.bucketName}${deleteRequest.path}"
+        val entityPath = "/${user.bucketName}${deleteRequest.path}"
+
         val fileEntity = fileRepository.findByPath(entityPath)
                 ?: throw EntityNotFound("file with path $entityPath not found")
 
         fileRepository.delete(fileEntity)
         val diskPath = "$rootLocation/${user.bucketName}${deleteRequest.path}"
+
+
         val file = File(diskPath)
         file.delete()
     }
