@@ -61,6 +61,7 @@ class FileStorageServiceImpl : FileStorageService {
         val entityPath = "${user.bucketName}${deleteRequest.path}"
         val fileEntity = fileRepository.findByPath(entityPath)
                 ?: throw EntityNotFound("file with path $entityPath not found")
+
         fileRepository.delete(fileEntity)
         val diskPath = "$rootLocation/${user.bucketName}${deleteRequest.path}"
         val file = File(diskPath)
