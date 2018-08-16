@@ -3,10 +3,7 @@ import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
-import ir.ac.ut.acm.storage.vamegh.exceptions.EntityNotFound
-import ir.ac.ut.acm.storage.vamegh.exceptions.NotUniqueException
-import ir.ac.ut.acm.storage.vamegh.exceptions.UnableToCreateDirectory
-import ir.ac.ut.acm.storage.vamegh.exceptions.UnexcpectedNullException
+import ir.ac.ut.acm.storage.vamegh.exceptions.*
 import ir.ac.ut.acm.storage.vamegh.repositories.FileRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -123,6 +120,8 @@ class FileStorageServiceImpl : FileStorageService {
             }
             else
                 completeParentPath = parentPath
+            if ( this.fileRepository.findByPath("$completeParentPath/$name") != null )
+                throw DirectoryWithSameNameExists("Directory with same path and name already exists!")
             val created = File("$rootLocation$completeParentPath/$name").mkdir()
             if(!created)
                 throw UnableToCreateDirectory("Directory could not be created!")
