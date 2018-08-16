@@ -4,6 +4,7 @@ package ir.ac.ut.acm.storage.vamegh.controllers.file
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileList
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MkdirRequest
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
 import org.slf4j.LoggerFactory
@@ -29,6 +30,13 @@ class FileController {
     fun uploadMultiFile(@RequestParam("file") file: MultipartFile,@RequestParam("path") path: String = "/" , principal: Principal){
         val user = userService.findByEmail(principal.name)
         fileStorage.store(file, user, path)
+    }
+
+    @PostMapping("/mkDir")
+    @PreAuthorize("isAuthenticated()")
+    fun createDirectory(@RequestBody mkdirRequest: MkdirRequest, principal: Principal){
+        var bucketName = userService.findByEmail(principal.name).bucketName
+        fileStorage.mkDir(name = mkdirRequest.name, parentPath = "/" + bucketName + mkdirRequest.path)
     }
 
     @GetMapping ("/list")
