@@ -64,4 +64,20 @@ class FileController {
 
         }
     }
+
+
+    @PostMapping("/copyfile")
+    @PreAuthorize("isAuthenticated()")
+    fun copyfile(@RequestParam("path") path: String = "/" , @RequestParam("newpath") newpath: String = "/",principal: Principal){
+        val user = userService.findByEmail(principal.name)
+        fileStorage.copyFile(path,user,newpath)
+    }
+
+
+    @PostMapping("/movefile")
+    @PreAuthorize("isAuthenticated()")
+    fun movefile(@RequestParam("path") path: String = "/" , @RequestParam("newpath") newpath: String = "/",principal: Principal){
+        val user = userService.findByEmail(principal.name)
+        fileStorage.moveFile(path,user,newpath)
+    }
 }

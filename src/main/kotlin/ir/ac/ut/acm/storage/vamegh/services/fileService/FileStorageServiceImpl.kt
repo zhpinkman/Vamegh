@@ -13,6 +13,13 @@ import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.util.*
+import java.nio.file.StandardCopyOption
+import java.nio.file.CopyOption
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.nio.file.Path
+
+
 
 
 @Service
@@ -40,6 +47,8 @@ class FileStorageServiceImpl : FileStorageService {
                     ?: throw EntityNotFound("file not found")
 
             fileEntity.name = renameRequest.newName
+            fileEntity.path = fileEntity.path.substringBeforeLast('/') + "/" + renameRequest.newName
+            println(fileEntity.path)
             fileRepository.save(fileEntity)
         }
         catch(e: Exception){
@@ -75,7 +84,7 @@ class FileStorageServiceImpl : FileStorageService {
 
         }
 
-    override fun store(file: MultipartFile  , user: User, path: String){
+    override fun store(file: MultipartFile , user: User, path: String){
         try{
             val parentPath : String
             if(path == "/"){
@@ -135,5 +144,80 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
+    override fun copyFile(path: String, user: User,newPath : String){
+        try{
+
+
+            val bucketPath : String
+            if(path == "/"){
+                bucketPath = "/${user.bucketName}"
+            }
+            else
+                bucketPath = "/${user.bucketName}$path"
+
+            val newParentPath : String
+            if(path == "/"){
+                newParentPath = "/${user.bucketName}"
+            }
+            else
+                newParentPath = "/${user.bucketName}$newPath"
+
+            val completePath = "$rootLocation$bucketPath"
+
+            val fileEntity = fileRepository.findByPath(bucketPath)
+                    ?: throw EntityNotFound("file with path $bucketPath not found")
+
+            val completeNewPath = "$rootLocation$newParentPath/${fileEntity.name}"
+
+            println(completePath)
+
+            val source = Paths.get(completePath)
+            val destination = Paths.get(completeNewPath)
+            Files.copy(source, destination, StandardCopyOption.COPY_ATTRIBUTES)
+            this.createFileEntityOnDb( name = fileEntity.name ,isDir = false ,  size = fileEntity.size , parentPath = newParentPath , isParentUnderBucket = true , type = fileEntity.type)
+        }
+        catch(e: Exception){
+            logger.error("Error in copying file: ${e.message}")
+            throw e
+        }
+
+    }
+
+    override fun moveFile( path: String, user: User,newPath : String){
+        try{
+            val bucketPath : String
+            if(path == "/"){
+                bucketPath = "/${user.bucketName}"
+            }
+            else
+                bucketPath = "/${user.bucketName}$path"
+
+            val newParentPath : String
+            if(path == "/"){
+                newParentPath = "/${user.bucketName}"
+            }
+            else
+                newParentPath = "/${user.bucketName}$newPath"
+
+            val completePath = "$rootLocation$bucketPath"
+
+            val fileEntity = fileRepository.findByPath(bucketPath)
+                    ?: throw EntityNotFound("file with path $bucketPath not found")
+
+            val completeNewPath = "$rootLocation$newParentPath/${fileEntity.name}"
+
+            val source = Paths.get(completePath)
+            val destination = Paths.get(completeNewPath)
+            Files.move(source, destination)
+            this.createFileEntityOnDb( name = fileEntity.name,isDir = false ,  size = fileEntity.size , parentPath = newParentPath , isParentUnderBucket = true , type = fileEntity.type!! )
+
+            fileRepository.delete(fileEntity)
+        }
+        catch(e: Exception){
+            logger.error("Error in copying file: ${e.message}")
+            throw e
+        }
+
+    }
 
 }

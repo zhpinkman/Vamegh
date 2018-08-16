@@ -13,4 +13,6 @@ interface FileStorageService{
     fun getFilesList(path: String , user: User): List<FileEntity>
     fun renameFile(renameRequest: RenameRequest, user: User)
     fun deleteFile(deleteRequest: DeleteRequest, user: User)
+    fun copyFile(path: String, user: User,newPath : String)
+    fun moveFile(path: String, user: User,newPath : String)
 }
