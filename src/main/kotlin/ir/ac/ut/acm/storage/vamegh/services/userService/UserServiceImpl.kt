@@ -47,8 +47,11 @@ class UserServiceImpl: UserService {
     override fun register(registerRequest: RegisterRequest){
         try {
             val emailPattern = "[^ @+-]*@(ut.ac.ir)$"
-            if (!emailPattern.toRegex().matches(registerRequest.email))
+            val passwordPattern = "^(?=.*[0-9]).{4,}$"
+            if (!emailPattern.toRegex().matches(registerRequest.email) )
                 throw InvalidValueException("email you entered is not valid!!")
+            if (!passwordPattern.toRegex().matches(registerRequest.password) )
+                throw InvalidValueException("password you entered is not valid!!")
             val passwordEncoded = passwordEncoder.encode(registerRequest.password)
             val user = User(email = registerRequest.email.toLowerCase(), bucketName = registerRequest.bucketName, password = passwordEncoded)
             fileStorageService.mkDir(  name = registerRequest.bucketName ,parentPath = "/")
