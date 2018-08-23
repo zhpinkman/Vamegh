@@ -1,6 +1,7 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
 
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileInfo
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
@@ -28,6 +29,9 @@ class FileStorageServiceImpl : FileStorageService {
 
     @Value("\${utCloud.storagePath}")
     lateinit var rootLocation: String
+
+    @Value("\${utCloud.baseDownloadUrl}")
+    lateinit var baseDownloadUrl: String
 
     @Autowired
     lateinit var fileRepository: FileRepository
@@ -99,7 +103,7 @@ class FileStorageServiceImpl : FileStorageService {
         }
     }
 
-    override fun getFilesList(path: String, user: User): List<FileEntity> {
+    override fun getFilesList(path: String, user: User): List<FileInfo> {
         try {
             val completeParentPath = "/${user.bucketName}"
             val parentId: String
@@ -107,7 +111,7 @@ class FileStorageServiceImpl : FileStorageService {
                 parentId = this.fileRepository.findByPath(completeParentPath + path)?.id ?: throw UnexcpectedNullException("id of file entity found null")
             else
                 parentId = this.fileRepository.findByPath(completeParentPath)?.id ?: throw UnexcpectedNullException("id of file entity found null")
-            return this.fileRepository.findAllByParentId(parentId)
+            return this.fileRepository.findAllByParentId(parentId).map { FileInfo(it , baseDownloadUrl + it.path) }
         } catch (e: Exception) {
             logger.error("Error in  getting Files list: ${e.message}")
             throw e
@@ -192,7 +196,7 @@ class FileStorageServiceImpl : FileStorageService {
         val destination = Paths.get(completeNewPath)
         try {
             Files.move(source, destination)
-            this.createFileEntityOnDb(name = fileEntity.name, isDir = false, size = fileEntity.size, parentPath = newParentPath, isParentUnderBucket = true, type = fileEntity.type!!)
+            this.createFileEntityOnDb(name = fileEntity.name, isDir = false, size = fileEntity.size, parentPath = newParentPath, isParentUnderBucket = true, type = fileEntity.type)
             fileRepository.delete(fileEntity)
         } catch (fileAlreadyExistsException: FileSystemException) {
             logger.error("unable to move. ${fileAlreadyExistsException.message}")
