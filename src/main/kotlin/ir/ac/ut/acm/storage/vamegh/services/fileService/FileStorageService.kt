@@ -1,6 +1,7 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
 
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileInfo
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.CopyRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
@@ -12,9 +13,10 @@ interface FileStorageService{
     fun store (file:MultipartFile , user: User, path: String)
     fun mkDir(name:String , parentPath: String )
     fun createFileEntityOnDb( name: String , size: Long , parentPath: String, isParentUnderBucket: Boolean , isDir: Boolean , type: String)
-    fun getFilesList(path: String , user: User): List<FileEntity>
+    fun getFilesList(path: String , user: User): List<FileInfo>
     fun renameFile(renameRequest: RenameRequest, user: User)
     fun deleteFile(deleteRequest: DeleteRequest, user: User)
     fun copyFile(copyRequest: CopyRequest, user: User)
     fun moveFile(moveRequest: MoveRequest, user: User)
+    fun exists(path:String):Boolean
 }
