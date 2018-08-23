@@ -40,8 +40,6 @@ class UserController {
     fun activate(@RequestBody acivationRequest: ActivationRequest){
         val user = userService.findById(acivationRequest.userId)
         val verificationResult = user.token.isValid(acivationRequest.token)
-        println(acivationRequest.token)
-        println(user.token.value)
         when (verificationResult) {
             0 -> {
                 user.active = true

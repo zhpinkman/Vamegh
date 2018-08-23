@@ -41,8 +41,9 @@ class AuthorizationServerConfig(val authenticationManager: AuthenticationManager
 
     }
     @Throws(Exception::class)
-    override fun configure(endpoints: AuthorizationServerEndpointsConfigurer?) {
-        endpoints!!
+    override fun configure(endpoints: AuthorizationServerEndpointsConfigurer) {
+        endpoints
+                .pathMapping("/oauth/token" , "/login")
                 .tokenStore(tokenStore())
                 .accessTokenConverter(accessTokenConverter())
                 .authenticationManager(authenticationManager)

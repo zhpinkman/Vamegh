@@ -5,6 +5,7 @@ import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileList
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MkdirRequest
+import ir.ac.ut.acm.storage.vamegh.exceptions.EntityNotFound
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
 import org.slf4j.LoggerFactory
@@ -13,6 +14,8 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.security.Principal
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
 
 @RestController
@@ -80,4 +83,5 @@ class FileController {
         val user = userService.findByEmail(principal.name)
         fileStorage.moveFile(path,user,newpath)
     }
+
 }

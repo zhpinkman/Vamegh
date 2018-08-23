@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository
 interface FileRepository : MongoRepository<FileEntity , String?> {
     fun findByPath(path: String): FileEntity?
     fun findAllByParentId(parentId: String): List<FileEntity>
+    fun existsByPath(path: String): Boolean
 }
