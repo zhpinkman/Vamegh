@@ -6,6 +6,7 @@ import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
 import ir.ac.ut.acm.storage.vamegh.entities.VerificationToken
 import ir.ac.ut.acm.storage.vamegh.exceptions.ExpiredException
 import ir.ac.ut.acm.storage.vamegh.exceptions.InvalidValueException
+import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.mailService.MailClientService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,6 +22,11 @@ import java.security.Principal
 class UserController {
     @Autowired
     private lateinit var userService: UserService
+
+
+    @Autowired
+    lateinit var fileStorageService: FileStorageService
+
 
     @Autowired
     private lateinit var mailClientService: MailClientService
@@ -43,6 +49,7 @@ class UserController {
         when (verificationResult) {
             0 -> {
                 user.active = true
+                fileStorageService.mkDir(  name = user.bucketName ,parentPath = "/")
                 userService.updateUser(user)}
             -1 -> throw ExpiredException("Verification token is created before 2 days ago")
             -2 -> throw InvalidValueException("Token value is not valid")
