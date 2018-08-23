@@ -3,6 +3,8 @@ package ir.ac.ut.acm.storage.vamegh.services.fileService
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileInfo
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.CopyRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.exceptions.*
@@ -57,7 +59,8 @@ class FileStorageServiceImpl : FileStorageService {
         }
 
     }
-    override fun deleteFile(deleteRequest: DeleteRequest , user: User) {
+
+    override fun deleteFile(deleteRequest: DeleteRequest, user: User) {
         val entityPath = "/${user.bucketName}${deleteRequest.path}"
         val fileEntity = fileRepository.findByPath(entityPath)
                 ?: throw EntityNotFound("file with path $entityPath not found")
@@ -111,7 +114,7 @@ class FileStorageServiceImpl : FileStorageService {
                 parentId = this.fileRepository.findByPath(completeParentPath + path)?.id ?: throw UnexcpectedNullException("id of file entity found null")
             else
                 parentId = this.fileRepository.findByPath(completeParentPath)?.id ?: throw UnexcpectedNullException("id of file entity found null")
-            return this.fileRepository.findAllByParentId(parentId).map { FileInfo(it , baseDownloadUrl + it.path) }
+            return this.fileRepository.findAllByParentId(parentId).map { FileInfo(it, baseDownloadUrl + it.path) }
         } catch (e: Exception) {
             logger.error("Error in  getting Files list: ${e.message}")
             throw e
@@ -141,24 +144,22 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun copyFile(path: String, user: User, newPath: String) {
+    override fun copyFile(copyRequest: CopyRequest, user: User) {
         val bucketPath: String
-        bucketPath = if (path == "/") {
-            "/${user.bucketName}"
+        if (copyRequest.oldPath == "/") {
+            bucketPath = "/${user.bucketName}"
         } else
-            "/${user.bucketName}$path"
+            bucketPath = "/${user.bucketName}${copyRequest.oldPath}"
 
         val newParentPath: String
-        newParentPath = if (path == "/") {
-            "/${user.bucketName}"
+        if (copyRequest.oldPath == "/") {
+            newParentPath = "/${user.bucketName}"
         } else
-            "/${user.bucketName}$newPath"
-
+            newParentPath = "/${user.bucketName}${copyRequest.newPath}"
         val completePath = "$rootLocation$bucketPath"
-
+        
         val fileEntity = fileRepository.findByPath(bucketPath)
                 ?: throw EntityNotFound("file with path $bucketPath not found")
-
         val completeNewPath = "$rootLocation$newParentPath/${fileEntity.name}"
 
         val source = Paths.get(completePath)
@@ -169,24 +170,21 @@ class FileStorageServiceImpl : FileStorageService {
         } catch (fileAlreadyExistsException: FileSystemException) {
             logger.error("unable to copy. ${fileAlreadyExistsException.message}")
         }
-
     }
 
-    override fun moveFile(path: String, user: User, newPath: String) {
+    override fun moveFile(moveRequest: MoveRequest, user: User) {
         val bucketPath: String
-        if (path == "/") {
+        if (moveRequest.oldPath == "/") {
             bucketPath = "/${user.bucketName}"
         } else
-            bucketPath = "/${user.bucketName}$path"
+            bucketPath = "/${user.bucketName}${moveRequest.oldPath}"
 
         val newParentPath: String
-        if (path == "/") {
+        if (moveRequest.oldPath == "/") {
             newParentPath = "/${user.bucketName}"
         } else
-            newParentPath = "/${user.bucketName}$newPath"
-
+            newParentPath = "/${user.bucketName}${moveRequest.newPath}"
         val completePath = "$rootLocation$bucketPath"
-
         val fileEntity = fileRepository.findByPath(bucketPath)
                 ?: throw EntityNotFound("file with path $bucketPath not found")
 
@@ -204,7 +202,7 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun exists(path:String):Boolean{
+    override fun exists(path: String): Boolean {
         return fileRepository.existsByPath(path)
 
     }
