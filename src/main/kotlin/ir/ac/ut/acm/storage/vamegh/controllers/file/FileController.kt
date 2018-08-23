@@ -4,7 +4,9 @@ package ir.ac.ut.acm.storage.vamegh.controllers.file
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.FileList
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.CopyRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MkdirRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
 import org.slf4j.LoggerFactory
@@ -68,16 +70,16 @@ class FileController {
 
     @PostMapping("/copyfile")
     @PreAuthorize("isAuthenticated()")
-    fun copyfile(@RequestParam("path") path: String = "/" , @RequestParam("newpath") newpath: String = "/",principal: Principal){
+    fun copyfile(@RequestBody copyRequest: CopyRequest, principal: Principal){
         val user = userService.findByEmail(principal.name)
-        fileStorage.copyFile(path,user,newpath)
+        fileStorage.copyFile(copyRequest  ,user)
     }
 
 
     @PostMapping("/movefile")
     @PreAuthorize("isAuthenticated()")
-    fun movefile(@RequestParam("path") path: String = "/" , @RequestParam("newpath") newpath: String = "/",principal: Principal){
+    fun movefile(@RequestBody moveRequest: MoveRequest, principal: Principal){
         val user = userService.findByEmail(principal.name)
-        fileStorage.moveFile(path,user,newpath)
+        fileStorage.moveFile(moveRequest,user)
     }
 }

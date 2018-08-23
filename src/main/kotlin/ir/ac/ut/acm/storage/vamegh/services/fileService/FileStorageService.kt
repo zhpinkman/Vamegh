@@ -2,6 +2,8 @@ package ir.ac.ut.acm.storage.vamegh.services.fileService
 
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.CopyRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import org.springframework.web.multipart.MultipartFile
@@ -13,6 +15,6 @@ interface FileStorageService{
     fun getFilesList(path: String , user: User): List<FileEntity>
     fun renameFile(renameRequest: RenameRequest, user: User)
     fun deleteFile(deleteRequest: DeleteRequest, user: User)
-    fun copyFile(path: String, user: User,newPath : String)
-    fun moveFile(path: String, user: User,newPath : String)
+    fun copyFile(copyRequest: CopyRequest, user: User)
+    fun moveFile(moveRequest: MoveRequest, user: User)
 }

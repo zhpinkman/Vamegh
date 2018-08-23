@@ -1,6 +1,8 @@
 package ir.ac.ut.acm.storage.vamegh.services.fileService
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.DeleteRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.CopyRequest
+import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
 import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.exceptions.*
@@ -144,23 +146,23 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun copyFile(path: String, user: User,newPath : String){
+    override fun copyFile(copyRequest: CopyRequest, user: User){
         try{
 
 
             val bucketPath : String
-            if(path == "/"){
+            if(copyRequest.oldPath == "/"){
                 bucketPath = "/${user.bucketName}"
             }
             else
-                bucketPath = "/${user.bucketName}$path"
+                bucketPath = "/${user.bucketName}${copyRequest.oldPath}"
 
             val newParentPath : String
-            if(path == "/"){
+            if(copyRequest.oldPath == "/"){
                 newParentPath = "/${user.bucketName}"
             }
             else
-                newParentPath = "/${user.bucketName}$newPath"
+                newParentPath = "/${user.bucketName}${copyRequest.newPath}"
 
             val completePath = "$rootLocation$bucketPath"
 
@@ -183,21 +185,21 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun moveFile( path: String, user: User,newPath : String){
+    override fun moveFile( moveRequest: MoveRequest, user: User){
         try{
             val bucketPath : String
-            if(path == "/"){
+            if(moveRequest.oldPath == "/"){
                 bucketPath = "/${user.bucketName}"
             }
             else
-                bucketPath = "/${user.bucketName}$path"
+                bucketPath = "/${user.bucketName}${moveRequest.oldPath}"
 
             val newParentPath : String
-            if(path == "/"){
+            if(moveRequest.oldPath == "/"){
                 newParentPath = "/${user.bucketName}"
             }
             else
-                newParentPath = "/${user.bucketName}$newPath"
+                newParentPath = "/${user.bucketName}${moveRequest.newPath}"
 
             val completePath = "$rootLocation$bucketPath"
 
