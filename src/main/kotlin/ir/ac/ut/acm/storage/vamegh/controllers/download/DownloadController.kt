@@ -14,7 +14,6 @@ import javax.servlet.http.HttpServletResponse
 
 
 @RestController
-@RequestMapping("download")
 class DownloadController {
 
     @Autowired
@@ -23,14 +22,14 @@ class DownloadController {
     @Autowired
     lateinit var userService: UserService
 
-    @GetMapping("/**")
-    @PreAuthorize("isAuthenticated()")
-    fun download(request: HttpServletRequest, response: HttpServletResponse, principal: Principal) {
-        val user = userService.findByEmail(principal.name)
+    @GetMapping("/*/*/**")
+//    @PreAuthorize("isAuthenticated()")
+    fun download(request: HttpServletRequest, response: HttpServletResponse) {
+//        val user = userService.findByEmail(principal.name)
         // if(request.contextPath.substringAfterLast('/')===user.bucketName){
         val path = request.requestURI
         if (fileStorage.exists(path)) {
-            response.sendRedirect("http://" + request.serverName + "/DownloadController" + request.requestURI)
+            response.setHeader("X-Accel-Redirect" , "/cloud$path")
         } else {
             throw EntityNotFound("file not found")
         }
