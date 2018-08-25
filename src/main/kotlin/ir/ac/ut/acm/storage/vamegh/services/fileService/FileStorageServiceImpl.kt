@@ -157,7 +157,7 @@ class FileStorageServiceImpl : FileStorageService {
         } else
             newParentPath = "/${user.bucketName}${copyRequest.newPath}"
         val completePath = "$rootLocation$bucketPath"
-        
+
         val fileEntity = fileRepository.findByPath(bucketPath)
                 ?: throw EntityNotFound("file with path $bucketPath not found")
         val completeNewPath = "$rootLocation$newParentPath/${fileEntity.name}"

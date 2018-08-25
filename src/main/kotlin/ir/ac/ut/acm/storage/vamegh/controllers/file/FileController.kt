@@ -68,7 +68,7 @@ class FileController {
     }
 
 
-    @PostMapping("/copy")
+    @PostMapping("/copyfile")
     @PreAuthorize("isAuthenticated()")
     fun copyfile(@RequestBody copyRequest: CopyRequest, principal: Principal){
         val user = userService.findByEmail(principal.name)
@@ -76,7 +76,7 @@ class FileController {
     }
 
 
-    @PostMapping("/move")
+    @PostMapping("/movefile")
     @PreAuthorize("isAuthenticated()")
     fun movefile(@RequestBody moveRequest: MoveRequest, principal: Principal){
         val user = userService.findByEmail(principal.name)
