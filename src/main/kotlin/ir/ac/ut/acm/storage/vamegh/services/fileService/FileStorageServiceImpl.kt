@@ -207,5 +207,9 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
+    override fun search(text: String, user: User) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
 
 }

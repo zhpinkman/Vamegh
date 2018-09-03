@@ -19,4 +19,5 @@ interface FileStorageService{
     fun copyFile(copyRequest: CopyRequest, user: User)
     fun moveFile(moveRequest: MoveRequest, user: User)
     fun exists(path:String):Boolean
+    fun search(text: String, user: User)
 }

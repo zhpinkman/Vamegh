@@ -83,4 +83,12 @@ class FileController {
         fileStorage.moveFile(moveRequest,user)
     }
 
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    fun search(@RequestParam("text")text: String , principal: Principal): FileList {
+        val user = userService.findByEmail(principal.name)
+        return FileList(fileStorage.getFilesList( text , user))
+    }
+
+
 }
