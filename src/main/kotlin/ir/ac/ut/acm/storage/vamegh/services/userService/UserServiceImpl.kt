@@ -61,13 +61,19 @@ class UserServiceImpl: UserService {
 
     }
 
+    @Value("\${utCloud.activationHost}")
+    lateinit var host: String
+
+    @Value("\${utCloud.activationPort}")
+    lateinit var port: String
+
     @Autowired
     private lateinit var mailClientService: MailClientService
     override fun sendVerificationMail(user: User) {
         user.token.reGenerate()
         updateUser(user)
         val link: UriComponentsBuilder = UriComponentsBuilder.newInstance()
-                .scheme("http").host("localhost").port(4200).path("/activation").queryParam("userId" , user.id).queryParam("token" , user.token.value)
+                .scheme("http").host(host).port(port).path("/activation").queryParam("userId" , user.id).queryParam("token" , user.token.value)
         link.build()
         mailClientService.prepareAndSend(user.email , link.toUriString())
     }

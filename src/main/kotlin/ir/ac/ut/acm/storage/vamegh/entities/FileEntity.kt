@@ -16,5 +16,6 @@ class FileEntity (
         @Indexed(unique = true)
         var path: String,
         val creationDate: Date,
-        val isDir: Boolean
+        val isDir: Boolean,
+        var isPublic: Boolean = false
 )

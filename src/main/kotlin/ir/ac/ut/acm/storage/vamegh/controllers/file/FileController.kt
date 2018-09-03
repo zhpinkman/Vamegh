@@ -37,7 +37,7 @@ class FileController {
     @PostMapping("/mkDir")
     @PreAuthorize("isAuthenticated()")
     fun createDirectory(@RequestBody mkdirRequest: MkdirRequest, principal: Principal){
-        var bucketName = userService.findByEmail(principal.name).bucketName
+        val bucketName = userService.findByEmail(principal.name).bucketName
         fileStorage.mkDir(name = mkdirRequest.name, parentPath = "/" + bucketName + mkdirRequest.path)
     }
 
@@ -83,4 +83,10 @@ class FileController {
         fileStorage.moveFile(moveRequest,user)
     }
 
+    @PostMapping("/toggleVisiblity")
+    @PreAuthorize("isAuthenticated()")
+    fun toggleVisiblity(@RequestBody filePath: String, principal: Principal){
+        val user = userService.findByEmail(principal.name)
+        fileStorage.toggleFileVisiblity(filePath , user)
+    }
 }

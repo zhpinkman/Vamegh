@@ -26,7 +26,6 @@ import java.util.*
 @Service
 class FileStorageServiceImpl : FileStorageService {
 
-
     val logger = LoggerFactory.getLogger(this.javaClass)
 
     @Value("\${utCloud.storagePath}")
@@ -202,10 +201,33 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun exists(path: String): Boolean {
-        return fileRepository.existsByPath(path)
-
+    override fun existsAndIsAllowed(path: String , user: User): Boolean {
+        if(fileRepository.existsByPath(path)){
+            val filesBucketName = path.substringAfter('/').substringAfter('/')
+            if(filesBucketName == user.bucketName || fileRepository.findByPath(path)!!.isPublic)
+                return true
+        }
+        return false
     }
 
+    override fun toggleFileVisiblity(path: String, user: User){
+        try {
+            val filesBucketName = path.substringAfter('/').substringAfter('/')
+            if(filesBucketName == user.bucketName){
+                val fileEntity: FileEntity = fileRepository.findByPath(path)!!
+                if (!(fileEntity.isDir))
+                {
+                    fileEntity.isPublic = !(fileEntity.isPublic)
+                    fileRepository.save(fileEntity)
+                }
+            }
+            else
+                throw NotAllowedException("File is Not Your's!")
+
+        } catch (e: Exception) {
+            logger.error("Error in Toggling Privacy: ${e.message}")
+            throw e
+        }
+    }
 
 }

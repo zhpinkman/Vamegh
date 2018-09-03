@@ -27,3 +27,5 @@ spring:
 utCloud:
   storagePath: /home/meg/Desktop/cloud
   baseDownloadUrl: http://142.93.66.250/api
+  activationHost: localhost
+  activationPort: 4200

@@ -18,5 +18,6 @@ interface FileStorageService{
     fun deleteFile(deleteRequest: DeleteRequest, user: User)
     fun copyFile(copyRequest: CopyRequest, user: User)
     fun moveFile(moveRequest: MoveRequest, user: User)
-    fun exists(path:String):Boolean
+    fun existsAndIsAllowed(path:String , user: User):Boolean
+    fun toggleFileVisiblity(path: String , user: User)
 }

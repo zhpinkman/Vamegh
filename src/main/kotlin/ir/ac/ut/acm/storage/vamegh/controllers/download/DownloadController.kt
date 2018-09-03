@@ -23,16 +23,13 @@ class DownloadController {
     lateinit var userService: UserService
 
     @GetMapping("/*/*/**")
-//    @PreAuthorize("isAuthenticated()")
-    fun download(request: HttpServletRequest, response: HttpServletResponse) {
-//        val user = userService.findByEmail(principal.name)
-        // if(request.contextPath.substringAfterLast('/')===user.bucketName){
+    @PreAuthorize("isAuthenticated()")
+    fun download(request: HttpServletRequest, response: HttpServletResponse , principal: Principal) {
+        val user = userService.findByEmail(principal.name)
         val path = request.requestURI
-        if (fileStorage.exists(path)) {
+        if (fileStorage.existsAndIsAllowed(path, user))
             response.setHeader("X-Accel-Redirect" , "/cloud$path")
-        } else {
+        else
             throw EntityNotFound("file not found")
-        }
-        //}
     }
 }
