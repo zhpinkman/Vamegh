@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.*
 
@@ -200,10 +201,10 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun existsAndIsAllowed(path: String, user: User?): Boolean {
+    override fun existsAndIsAllowed(path: String , user: User): Boolean {
         if(fileRepository.existsByPath(path)){
-//            val filesBucketName = path.substringAfter('/').substringAfter('/')
-//            if((user != null && filesBucketName == user.bucketName ) || fileRepository.findByPath(path)!!.isPublic)
+            val filesBucketName = path.substringAfter('/').substringAfter('/')
+            if(filesBucketName == user.bucketName || fileRepository.findByPath(path)!!.isPublic)
                 return true
         }
         return false

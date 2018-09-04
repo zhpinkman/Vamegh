@@ -14,6 +14,5 @@ class FileInfo(fileEntity: FileEntity , url: String){
     var path: String = fileEntity.path
     val creationDate: Date = fileEntity.creationDate
     val isDir: Boolean = fileEntity.isDir
-    val isPublic: Boolean = fileEntity.isPublic
     val url = if(isDir) null else url
 }
