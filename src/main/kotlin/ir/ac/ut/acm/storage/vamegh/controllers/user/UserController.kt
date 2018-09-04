@@ -4,7 +4,6 @@ package ir.ac.ut.acm.storage.vamegh.controllers.user
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.ActivationRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.RegisterRequest
 import ir.ac.ut.acm.storage.vamegh.entities.VerificationToken
-import ir.ac.ut.acm.storage.vamegh.exceptions.EntityNotFound
 import ir.ac.ut.acm.storage.vamegh.exceptions.ExpiredException
 import ir.ac.ut.acm.storage.vamegh.exceptions.InvalidValueException
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
@@ -39,7 +38,7 @@ class UserController {
 
     @GetMapping("/resendverif")
     fun reSendActivationLink(@RequestHeader email: String){
-        val user = userService.findByEmail(email)?: throw EntityNotFound("user with email: $email not found")
+        val user = userService.findByEmail(email)
         userService.sendVerificationMail(user)
     }
 
