@@ -29,8 +29,8 @@ class UserServiceImpl: UserService {
     @Value("\${utCloud.storagePath}")
     lateinit var rootLocation: String
 
-    override fun findByEmail(email: String) : User {
-       return userRepository.findByEmail(email) ?: throw EntityNotFound("user with email: $email not found")
+    override fun findByEmail(email: String) : User? {
+       return userRepository.findByEmail(email)
     }
 
     override fun findById(id: String): User {

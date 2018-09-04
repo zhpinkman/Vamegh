@@ -18,7 +18,7 @@ class VameghUserDetailsService : UserDetailsService {
             return null
         val user = userService.findByEmail(username)
         val userDetails = MyUserDetails()
-        userDetails._username = user.email
+        userDetails._username = user!!.email
         userDetails._password = user.password
         userDetails._userId = user.id!!
         userDetails._active = user.active
