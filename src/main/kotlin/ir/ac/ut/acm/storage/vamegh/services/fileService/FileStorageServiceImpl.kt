@@ -201,10 +201,10 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun existsAndIsAllowed(path: String , user: User): Boolean {
+    override fun existsAndIsAllowed(path: String , user: User?): Boolean {
         if(fileRepository.existsByPath(path)){
-            val filesBucketName = path.substringAfter('/').substringAfter('/')
-            if(filesBucketName == user.bucketName || fileRepository.findByPath(path)!!.isPublic)
+//            val filesBucketName = path.substringAfter('/').substringAfter('/')
+//            if(filesBucketName == user.bucketName || fileRepository.findByPath(path)!!.isPublic)
                 return true
         }
         return false
