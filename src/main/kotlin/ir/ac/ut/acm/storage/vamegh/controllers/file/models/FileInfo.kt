@@ -15,4 +15,5 @@ class FileInfo(fileEntity: FileEntity , url: String){
     val creationDate: Date = fileEntity.creationDate
     val isDir: Boolean = fileEntity.isDir
     val url = if(isDir) null else url
+    val userId: String? = fileEntity.userId
 }

@@ -9,6 +9,7 @@ import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.exceptions.*
 import ir.ac.ut.acm.storage.vamegh.repositories.FileRepository
+import jdk.nashorn.internal.runtime.regexp.joni.Config.log
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -25,7 +26,6 @@ import java.util.*
 
 @Service
 class FileStorageServiceImpl : FileStorageService {
-
 
     val logger = LoggerFactory.getLogger(this.javaClass)
 
@@ -72,7 +72,7 @@ class FileStorageServiceImpl : FileStorageService {
         file.delete()
     }
 
-    override fun createFileEntityOnDb(name: String, size: Long, parentPath: String, isParentUnderBucket: Boolean, isDir: Boolean, type: String) {
+    override fun createFileEntityOnDb(name: String, size: Long, parentPath: String, isParentUnderBucket: Boolean, isDir: Boolean, type: String, userId: String?) {
         try {
             val now = Date()
             val parentId: String?
@@ -81,7 +81,7 @@ class FileStorageServiceImpl : FileStorageService {
             else
                 parentId = parentPath
             val completePath = "$parentPath/$name"
-            this.fileRepository.save(FileEntity(name = name, size = size, parentId = parentId, creationDate = now, isDir = isDir, path = completePath, type = type))
+            this.fileRepository.save(FileEntity(name = name, size = size, parentId = parentId, creationDate = now, isDir = isDir, path = completePath, type = type, userId = userId))
         } catch (e: DuplicateKeyException) {
             throw NotUniqueException("Chosen Email or Bucket name is not unique")
         }
@@ -99,7 +99,7 @@ class FileStorageServiceImpl : FileStorageService {
             val newFile = File(completePath)
             newFile.createNewFile()
             file.transferTo(newFile)
-            this.createFileEntityOnDb(name = file.originalFilename!!, isDir = false, size = file.size, parentPath = parentPath, isParentUnderBucket = true, type = file.contentType!!)
+            this.createFileEntityOnDb(name = file.originalFilename!!, isDir = false, size = file.size, parentPath = parentPath, isParentUnderBucket = true, type = file.contentType!!, userId = user.id)
         } catch (e: Exception) {
             logger.error("Error in saving file: ${e.message}")
             throw e
@@ -121,7 +121,7 @@ class FileStorageServiceImpl : FileStorageService {
         }
     }
 
-    override fun mkDir(name: String, parentPath: String) {
+    override fun mkDir(name: String, parentPath: String, user: User) {
         try {
             val completeParentPath: String
             var isParentUnderBucket = true
@@ -135,7 +135,7 @@ class FileStorageServiceImpl : FileStorageService {
             val created = File("$rootLocation$completeParentPath/$name").mkdir()
             if (!created)
                 throw UnableToCreateDirectory("Directory could not be created!")
-            this.createFileEntityOnDb(name = name, isDir = true, size = 0, parentPath = completeParentPath, isParentUnderBucket = isParentUnderBucket, type = "dir")
+            this.createFileEntityOnDb(name = name, isDir = true, size = 0, parentPath = completeParentPath, isParentUnderBucket = isParentUnderBucket, type = "dir", userId = user.id)
 
         } catch (e: Exception) {
             logger.error("Error in Creating Directory: ${e.message}")
@@ -166,7 +166,7 @@ class FileStorageServiceImpl : FileStorageService {
         val destination = Paths.get(completeNewPath)
         try {
             Files.copy(source, destination, StandardCopyOption.COPY_ATTRIBUTES)
-            this.createFileEntityOnDb(name = fileEntity.name, isDir = false, size = fileEntity.size, parentPath = newParentPath, isParentUnderBucket = true, type = fileEntity.type)
+            this.createFileEntityOnDb(name = fileEntity.name, isDir = false, size = fileEntity.size, parentPath = newParentPath, isParentUnderBucket = true, type = fileEntity.type, userId = user.id)
         } catch (fileAlreadyExistsException: FileSystemException) {
             logger.error("unable to copy. ${fileAlreadyExistsException.message}")
         }
@@ -194,7 +194,7 @@ class FileStorageServiceImpl : FileStorageService {
         val destination = Paths.get(completeNewPath)
         try {
             Files.move(source, destination)
-            this.createFileEntityOnDb(name = fileEntity.name, isDir = false, size = fileEntity.size, parentPath = newParentPath, isParentUnderBucket = true, type = fileEntity.type)
+            this.createFileEntityOnDb(name = fileEntity.name, isDir = false, size = fileEntity.size, parentPath = newParentPath, isParentUnderBucket = true, type = fileEntity.type, userId = user.id)
             fileRepository.delete(fileEntity)
         } catch (fileAlreadyExistsException: FileSystemException) {
             logger.error("unable to move. ${fileAlreadyExistsException.message}")
@@ -202,13 +202,44 @@ class FileStorageServiceImpl : FileStorageService {
 
     }
 
-    override fun exists(path: String): Boolean {
-        return fileRepository.existsByPath(path)
-
+    override fun existsAndIsAllowed(path: String , user: User): Boolean {
+        if(fileRepository.existsByPath(path)){
+            val filesBucketName = path.substringAfter('/').substringAfter('/')
+            if(filesBucketName == user.bucketName || fileRepository.findByPath(path)!!.isPublic)
+                return true
+        }
+        return false
     }
 
-    override fun search(text: String, user: User) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+
+    override fun toggleFileVisiblity(path: String, user: User){
+        try {
+            val filesBucketName = path.substringAfter('/').substringAfter('/')
+            if(filesBucketName == user.bucketName){
+                val fileEntity: FileEntity = fileRepository.findByPath(path)!!
+                if (!(fileEntity.isDir))
+                {
+                    fileEntity.isPublic = !(fileEntity.isPublic)
+                    fileRepository.save(fileEntity)
+                }
+            }
+            else
+                throw NotAllowedException("File is Not Your's!")
+
+        } catch (e: Exception) {
+            logger.error("Error in Toggling Privacy: ${e.message}")
+            throw e
+        }
+    }
+
+    override fun search(text: String, user: User): List<FileInfo> {
+        try {
+            return this.fileRepository.findByNameAndUserId(text, user.id)
+            logger.info("in search repository !!!")
+        }catch (e: Exception) {
+            logger.error("Nothing Found!!: ${e.message}")
+            throw  e
+        }
     }
 
 

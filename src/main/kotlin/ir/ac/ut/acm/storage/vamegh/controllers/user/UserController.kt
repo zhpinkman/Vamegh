@@ -49,7 +49,7 @@ class UserController {
         when (verificationResult) {
             0 -> {
                 user.active = true
-                fileStorageService.mkDir(  name = user.bucketName ,parentPath = "/")
+                fileStorageService.mkDir(  name = user.bucketName ,parentPath = "/", user = user)
                 userService.updateUser(user)}
             -1 -> throw ExpiredException("Verification token is created before 2 days ago")
             -2 -> throw InvalidValueException("Token value is not valid")

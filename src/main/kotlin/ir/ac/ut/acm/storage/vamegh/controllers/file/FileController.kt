@@ -9,6 +9,7 @@ import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MkdirRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
+import jdk.nashorn.internal.runtime.regexp.joni.Config.log
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.security.access.prepost.PreAuthorize
@@ -37,8 +38,9 @@ class FileController {
     @PostMapping("/mkDir")
     @PreAuthorize("isAuthenticated()")
     fun createDirectory(@RequestBody mkdirRequest: MkdirRequest, principal: Principal){
-        var bucketName = userService.findByEmail(principal.name).bucketName
-        fileStorage.mkDir(name = mkdirRequest.name, parentPath = "/" + bucketName + mkdirRequest.path)
+        val bucketName = userService.findByEmail(principal.name).bucketName
+        val user = userService.findByEmail(principal.name)
+        fileStorage.mkDir(name = mkdirRequest.name, parentPath = "/" + bucketName + mkdirRequest.path, user = user)
     }
 
     @GetMapping ("/list")
@@ -67,14 +69,12 @@ class FileController {
         }
     }
 
-
     @PostMapping("/copyfile")
     @PreAuthorize("isAuthenticated()")
     fun copyfile(@RequestBody copyRequest: CopyRequest, principal: Principal){
         val user = userService.findByEmail(principal.name)
         fileStorage.copyFile(copyRequest  ,user)
     }
-
 
     @PostMapping("/movefile")
     @PreAuthorize("isAuthenticated()")
@@ -83,12 +83,19 @@ class FileController {
         fileStorage.moveFile(moveRequest,user)
     }
 
-    @GetMapping("/search")
+    @PostMapping("/toggleVisiblity")
     @PreAuthorize("isAuthenticated()")
-    fun search(@RequestParam("text")text: String , principal: Principal): FileList {
+    fun toggleVisiblity(@RequestBody filePath: String, principal: Principal){
         val user = userService.findByEmail(principal.name)
-        return FileList(fileStorage.getFilesList( text , user))
+        fileStorage.toggleFileVisiblity(filePath , user)
     }
 
+    @GetMapping("/search")
+    @PreAuthorize("isAuthenticated()")
+    fun search(@RequestParam("text") text: String, principal: Principal): FileList {
+        val user = userService.findByEmail(principal.name)
+        return FileList(fileStorage.search(text, user))
+        logger.info("in search service")
+    }
 
 }
