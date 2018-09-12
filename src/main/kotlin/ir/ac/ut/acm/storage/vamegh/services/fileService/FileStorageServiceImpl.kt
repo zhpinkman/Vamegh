@@ -232,9 +232,6 @@ class FileStorageServiceImpl : FileStorageService {
 
     override fun search(text: String, user: User): List<FileEntity> {
         try {
-            logger.info("in search repository !!!")
-            logger.info("user.id: ", user.id)
-            logger.info("text: ", text)
             return this.fileRepository.findByNameStartingWithAndUserId(text, user.id )
         }catch (e: Exception) {
             logger.error("Nothing Found!!: ${e.message}")
