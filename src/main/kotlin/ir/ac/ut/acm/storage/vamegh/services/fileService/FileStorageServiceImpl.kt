@@ -9,7 +9,6 @@ import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.entities.User
 import ir.ac.ut.acm.storage.vamegh.exceptions.*
 import ir.ac.ut.acm.storage.vamegh.repositories.FileRepository
-import jdk.nashorn.internal.runtime.regexp.joni.Config.log
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
-import java.nio.file.Path
 import java.nio.file.StandardCopyOption
 import java.util.*
 
@@ -232,15 +230,16 @@ class FileStorageServiceImpl : FileStorageService {
         }
     }
 
-    override fun search(text: String, user: User): List<FileInfo> {
+    override fun search(text: String, user: User): List<FileEntity> {
         try {
-            return this.fileRepository.findByNameAndUserId(text, user.id)
             logger.info("in search repository !!!")
+            logger.info("user.id: ", user.id)
+            logger.info("text: ", text)
+            return this.fileRepository.findByNameStartingWithAndUserId(text, user.id )
         }catch (e: Exception) {
             logger.error("Nothing Found!!: ${e.message}")
             throw  e
         }
     }
-
 
 }

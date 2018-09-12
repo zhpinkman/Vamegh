@@ -20,6 +20,6 @@ interface FileStorageService{
     fun moveFile(moveRequest: MoveRequest, user: User)
     fun existsAndIsAllowed(path:String , user: User):Boolean
     fun toggleFileVisiblity(path: String , user: User)
-    fun search(text: String, user: User): List<FileInfo>
+    fun search(text: String, user: User): List<FileEntity>
 
 }

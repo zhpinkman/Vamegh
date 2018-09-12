@@ -7,6 +7,7 @@ import ir.ac.ut.acm.storage.vamegh.controllers.file.models.RenameRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.CopyRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MkdirRequest
 import ir.ac.ut.acm.storage.vamegh.controllers.user.models.MoveRequest
+import ir.ac.ut.acm.storage.vamegh.entities.FileEntity
 import ir.ac.ut.acm.storage.vamegh.services.fileService.FileStorageService
 import ir.ac.ut.acm.storage.vamegh.services.userService.UserService
 import jdk.nashorn.internal.runtime.regexp.joni.Config.log
@@ -92,10 +93,9 @@ class FileController {
 
     @GetMapping("/search")
     @PreAuthorize("isAuthenticated()")
-    fun search(@RequestParam("text") text: String, principal: Principal): FileList {
+    fun search(@RequestParam("text") text: String, principal: Principal): List<FileEntity> {
         val user = userService.findByEmail(principal.name)
-        return FileList(fileStorage.search(text, user))
-        logger.info("in search service")
+        return fileStorage.search(text, user)
     }
 
 }
