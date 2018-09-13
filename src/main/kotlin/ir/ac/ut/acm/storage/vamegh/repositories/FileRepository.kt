@@ -10,6 +10,6 @@ interface FileRepository : MongoRepository<FileEntity , String?> {
     fun findByPath(path: String): FileEntity?
     fun findAllByParentId(parentId: String): List<FileEntity>
     fun existsByPath(path: String): Boolean
-//    @Query("{ 'name' : ?0 }")
-    fun findByNameStartingWithAndUserId(regexp: String, userId: String?): List<FileEntity>
+    @Query("{'userId' : ?0, 'name' : {\$regex : '.*?1.*'}}')")
+    fun findByUserIdAndRegexpName(userId: String, regexp: String): List<FileEntity>
 }

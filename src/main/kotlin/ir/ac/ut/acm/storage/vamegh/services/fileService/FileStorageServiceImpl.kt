@@ -231,12 +231,11 @@ class FileStorageServiceImpl : FileStorageService {
     }
 
     override fun search(text: String, user: User): List<FileEntity> {
-        try {
-            return this.fileRepository.findByNameStartingWithAndUserId(text, user.id )
-        }catch (e: Exception) {
-            logger.error("Nothing Found!!: ${e.message}")
-            throw  e
-        }
+
+        return this.fileRepository.findByUserIdAndRegexpName(
+                user.id ?: throw UnexcpectedNullException("id is null"),
+                 text)
+
     }
 
 }
